@@ -1,0 +1,80 @@
+clear
+load Compounds.mat
+%sample and stepvector set up
+
+sampleLTry10=log10(squeeze(CutData.X(1,:,:))+1); 
+sampleLTry1=log10(squeeze(CutData.X(3,:,:))+1);
+sampleLTry_1=log10(squeeze(CutData.X(5,:,:))+1);
+sampleDTry10=log10(squeeze(CutData.X(6,:,:))+1);
+sampleDTry1=log10(squeeze(CutData.X(8,:,:))+1);
+sampleDTry_1=log10(squeeze(CutData.X(10,:,:))+1);
+sampleLPhe10=log10(squeeze(CutData.X(11,:,:))+1);
+sampleLPhe1=log10(squeeze(CutData.X(13,:,:))+1);
+sampleLPhe_1=log10(squeeze(CutData.X(15,:,:))+1);
+sampleDPhe10=log10(squeeze(CutData.X(16,:,:))+1);
+sampleDPhe1=log10(squeeze(CutData.X(18,:,:))+1);
+sampleDPhe_1=log10(squeeze(CutData.X(20,:,:))+1);
+sampleLTyr10=log10(squeeze(CutData.X(21,:,:))+1);
+sampleLTyr1=log10(squeeze(CutData.X(23,:,:))+1);
+sampleLTyr_1=log10(squeeze(CutData.X(25,:,:))+1);
+sampleDTyr10=log10(squeeze(CutData.X(26,:,:))+1);
+sampleDTyr1=log10(squeeze(CutData.X(28,:,:))+1);
+sampleDTyr_1=log10(squeeze(CutData.X(30,:,:))+1);
+sampleH2O_1=log10(squeeze(CutData.X(31,:,:))+1);
+sampleH2O_2=log10(squeeze(CutData.X(31,:,:))+1);
+
+%gradients
+trystepvector10=linspace(0,7,500);
+trystepvector1=linspace(0,0.5,60);
+trystepvector_1=linspace(0,0.1,25);
+
+phestepvector10=linspace(0,0.06,20);
+phestepvector1=linspace(0,0.04,20);
+phestepvector_1=linspace(0,0.035,20);
+
+EEMs= colorbar; brighten(jet,.5); xlabel('Excitation wavelength (nm)'); ylabel('Emission wavelength (nm)'); xlim([240,350]); ylim([260,500]);
+
+%figuremaking 
+%L-Try
+figure; 
+subplot(2,2,1); contourf(Ex,Em,sampleLTry10,trystepvector10); shading interp; EEMs; title('L-Try 10');
+subplot(2,2,2); contourf(Ex,Em,sampleLTry1,trystepvector1);shading interp; EEMs; title('L-Try 1.0');
+subplot(2,2,3); contourf(Ex,Em,sampleLTry_1,trystepvector_1);shading interp; EEMs; title('L-Try 0.1');
+
+%D-Try
+figure; 
+subplot(2,2,1); contourf(Ex,Em,sampleDTry10,trystepvector10);shading interp; EEMs; title('D-Try 10');
+subplot(2,2,2); contourf(Ex,Em,sampleDTry1,trystepvector1);shading interp; EEMs; title('D-Try 1.0');
+subplot(2,2,3); contourf(Ex,Em,sampleDTry_1,trystepvector_1);shading interp; EEMs; title('D-Try 0.1');
+
+%L-Phe
+figure;
+subplot(2,2,1); contourf(Ex,Em,sampleLPhe10,phestepvector10);shading interp; EEMs; title('L-Phe 10');
+subplot(2,2,2); contourf(Ex,Em,sampleLPhe1,phestepvector1);shading interp; EEMs; title('L-Phe 1.0');
+subplot(2,2,3); contourf(Ex,Em,sampleLPhe_1,phestepvector_1);shading interp; EEMs; title('L-Phe 0.1');
+
+%D-Phe
+figure;
+subplot(2,2,1); contourf(Ex,Em,sampleDPhe10,phestepvector10);shading interp; EEMs; title('D-Phe 10');
+subplot(2,2,2); contourf(Ex,Em,sampleDPhe1,phestepvector1);shading interp; EEMs; title('D-Phe 1.0');
+subplot(2,2,3); contourf(Ex,Em,sampleDPhe_1,phestepvector_1);shading interp; EEMs; title('D-Phe 0.1');
+
+%L-tyr
+figure; 
+subplot(2,2,1); contourf(Ex,Em,sampleLTyr10,trystepvector10);shading interp; EEMs; title('L-Tyr 10');
+subplot(2,2,2); contourf(Ex,Em,sampleLTyr1,trystepvector1);shading interp; EEMs; title('L-Tyr 1.0');
+subplot(2,2,3); contourf(Ex,Em,sampleLTyr_1,trystepvector_1);shading interp; EEMs; title('L-Tyr 0.1');
+
+%D-tyr
+figure; 
+subplot(2,2,1); contourf(Ex,Em,sampleDTyr10,trystepvector10);shading interp; EEMs; title('D-Tyr 10');
+subplot(2,2,2); contourf(Ex,Em,sampleDTyr1,trystepvector1);shading interp; EEMs; title('D-Tyr 1.0');
+subplot(2,2,3); contourf(Ex,Em,sampleDTyr_1,trystepvector_1);shading interp; EEMs; title('D-Tyr 0.1');
+
+%Water
+figure; 
+subplot(1,2,1); contourf(Ex,Em,sampleH2O_1,trystepvector10);shading interp; EEMs; title('H2O_1');
+subplot(1,2,2); contourf(Ex,Em,sampleH2O_2,trystepvector1);shading interp; EEMs; title('H2O_2');
+
+
+
