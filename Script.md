@@ -6,6 +6,7 @@
 %           Revised Jan 2016 for Zach Quinlan CMORE
 %           Revised Sep 2016 for Zach Quinlan CMORE
 %           Revised Oct 2016 for Zach Quinlan/BobWhittier CMORE
+%           Revised Oct 2017 for Zach Quinlan (Added Lignin for Linda)
 %           Revised and uploaded Nov 2016 by Zach Quinlan for future version control
 %           Read in csv files from from Fluoromax/Aqualog / FluorEssence software
 %           Collate the files into a database
@@ -111,7 +112,7 @@ close all; % closes all open files
 %          In this area you will input all of your run parameters for the set
 %           in the future you can hard-code these values.
 
-EEMfilename='Abaya.tsv'; % input('What is the name of the Sample listing tab-delimited text file (in single quotes, including extension)?\n?: ');
+EEMfilename='SPIFFY_Long.tsv'; % input('What is the name of the Sample listing tab-delimited text file (in single quotes, including extension)?\n?: ');
 disp('Note: column 2 should list text Blank or Sample, column 1 should have unique informative names of samples,');
 disp('      columns 3, 4, and 5 should list complete path names for each sample and respective blanks,');
 disp('      and column 6 lists complete path names for the absorbance scan.');
@@ -276,6 +277,7 @@ end;
 [c index] = min(abs(Em-435));NearestEm435=Em(index);% for Optical Brighteners
 [c index] = min(abs(Em-510));NearestEm510=Em(index);% for dieselBandII
 [c index] = min(abs(Em-510));NearestEm510=Em(index);% for Petroleum
+[c index] = min(abs(Em-360));NearestEm360=Em(index);% for Lignin
 
 for i=1:size(EEMainTrimmed,1)
     CobleA(1,i)=EEMainTrimmed(i,find(Em==NearestEm450,1),find(Ex==320,1)); % picks Excite 320 Emission 450 (Coble Peak A)
@@ -288,6 +290,7 @@ for i=1:size(EEMainTrimmed,1)
     OpticalBrighteners(1,i)=EEMainTrimmed(i,find(Em==NearestEm435,1),find(Ex==360,1)); % picks Excite 435 Emission 360
     DieselBandII(1,i)=EEMainTrimmed(i,find(Em==NearestEm510,1),find(Ex==410,1));%picks Excite 410, Emission 550
     Petroleum(1,i)=EEMainTrimmed(i,find(Em==NearestEm510,1),find(Ex==270,1));%Picks Excite 270, Emission 500
+    Lignin(1,i)=EEMainTrimmed(i,find(Em==NearestEm360,1),find(Ex==240,1));% Picks Excite 240, Emission 360 (Lignin)
     MtoC(1,i)=CobleM(1,i)/CobleC(1,i);
     BIX(1,i)=EEMainTrimmed(i,find(Em==NearestEm380,1),find(Ex==310,1))/EEMainTrimmed(i,find(Em==NearestEm430,1),find(Ex==310,1));
     HIX(1,i)=sum(EEMainTrimmed(i,find(Em==NearestEm434,1):find(Em==NearestEm480,1),find(Ex==255,1)))/sum(EEMainTrimmed(i,find(Em==NearestEm300,1):find(Em==NearestEm346,1),find(Ex==255,1)));
@@ -303,7 +306,7 @@ disp('Final data structure for use in DOMFluor exported to structure array MainD
 %MainData % Lists the contents of the data structure to be input to DOMFluor
 [CutData]=EEMCut(MainData,40,0,15,0,''); % Trims the dataset
 %PlotSurfby4(1,CutData,'R.U.'); % Plots sequential plots of the EEMs
-[Test1]=OutlierTest(CutData,2,2,4,'Yes','No'); % Examines the structure of PARAFAC models up to 6 modes using steps 2nm emission and 5nm excite.
+[Test1]=OutlierTest(CutData,2,2,6,'Yes','No'); % Examines the structure of PARAFAC models up to 6 models using steps 2nm emission and 5nm excite.
 %PlotLL(Test1,2);
 %PlotLL(Test1,3);
 %PlotLL(Test1,4);
@@ -311,36 +314,36 @@ disp('Final data structure for use in DOMFluor exported to structure array MainD
 %PlotLL(Test1,6);
 %EvalModelSurf(Test1,6);
 [AnalysisData]=SplitData(Test1);
-[AnalysisData]=SplitHalfAnalysis(AnalysisData,(2:4),'SplitHalf.mat');
-SplitHalfValidation(AnalysisData,'1-2',2);
-SplitHalfValidation(AnalysisData,'3-4',2);
-SplitHalfValidation(AnalysisData,'1-2',3);
-SplitHalfValidation(AnalysisData,'3-4',3);
+[AnalysisData]=SplitHalfAnalysis(AnalysisData,(4:6),'SplitHalf.mat');
 SplitHalfValidation(AnalysisData,'1-2',4);
 SplitHalfValidation(AnalysisData,'3-4',4);
-[AnalysisData]=RandInitAnal(AnalysisData,2,10);
-[AnalysisData]=RandInitAnal(AnalysisData,3,10);
+SplitHalfValidation(AnalysisData,'1-2',5);
+SplitHalfValidation(AnalysisData,'3-4',5);
+SplitHalfValidation(AnalysisData,'1-2',6);
+SplitHalfValidation(AnalysisData,'3-4',6);
 [AnalysisData]=RandInitAnal(AnalysisData,4,10);
-TCC(AnalysisData.Model2,AnalysisData.Split(1).Fac_2);
-TCC(AnalysisData.Model2,AnalysisData.Split(2).Fac_2);
-TCC(AnalysisData.Model2,AnalysisData.Split(3).Fac_2);
-TCC(AnalysisData.Model2,AnalysisData.Split(4).Fac_2);
-TCC(AnalysisData.Model3,AnalysisData.Split(1).Fac_3);
-TCC(AnalysisData.Model3,AnalysisData.Split(2).Fac_3);
-TCC(AnalysisData.Model3,AnalysisData.Split(3).Fac_3);
-TCC(AnalysisData.Model3,AnalysisData.Split(4).Fac_3);
+[AnalysisData]=RandInitAnal(AnalysisData,5,10);
+[AnalysisData]=RandInitAnal(AnalysisData,6,10);
 TCC(AnalysisData.Model4,AnalysisData.Split(1).Fac_4);
 TCC(AnalysisData.Model4,AnalysisData.Split(2).Fac_4);
 TCC(AnalysisData.Model4,AnalysisData.Split(3).Fac_4);
 TCC(AnalysisData.Model4,AnalysisData.Split(4).Fac_4);
+TCC(AnalysisData.Model5,AnalysisData.Split(1).Fac_5);
+TCC(AnalysisData.Model5,AnalysisData.Split(2).Fac_5);
+TCC(AnalysisData.Model5,AnalysisData.Split(3).Fac_5);
+TCC(AnalysisData.Model5,AnalysisData.Split(4).Fac_5);
+TCC(AnalysisData.Model6,AnalysisData.Split(1).Fac_6);
+TCC(AnalysisData.Model6,AnalysisData.Split(2).Fac_6);
+TCC(AnalysisData.Model6,AnalysisData.Split(3).Fac_6);
+TCC(AnalysisData.Model6,AnalysisData.Split(4).Fac_6);
 %PlotLL(AnalysisData,4);
 %EvalModelSurf(AnalysisData,4);
-[PFMax4,PFEmLoad4,PFExLoad4]=ModelOut(AnalysisData,2,'ParafacResults4Component.xlsx');
-[PFMax5,PFEmLoad5,PFExLoad5]=ModelOut(AnalysisData,3,'ParafacResults5Component.xlsx');
-[PFMax6,PFEmLoad6,PFExLoad6]=ModelOut(AnalysisData,4,'ParafacResults6Component.xlsx');
+[PFMax4,PFEmLoad4,PFExLoad4]=ModelOut(AnalysisData,4,'ParafacResults4Component.xlsx');
+[PFMax5,PFEmLoad5,PFExLoad5]=ModelOut(AnalysisData,5,'ParafacResults5Component.xlsx');
+[PFMax6,PFEmLoad6,PFExLoad6]=ModelOut(AnalysisData,6,'ParafacResults6Component.xlsx');
 
 %          Summarize and export EEM index and PARAFAC Data
-SummaryDataRows=cellstr(char('Raman peak area of blanks','Total blank1 RU','Total Blank2 RU','Total sample RU after blank subtraction','Position in final database','M:C','BIX','HIX','FI','Ultra Violet Humic-like','Marine Humic-like','Visible Humic-like','Tryptophan-like','Tyrosine-like','Phenylalanine-like','Fulvic Acid-like','Optical Brighteners','Diesel Band II','Petroleum','PARAFAC1','PARAFAC2','PARAFAC3','PARAFAC4'));
+SummaryDataRows=cellstr(char('Raman peak area of blanks','Total blank1 RU','Total Blank2 RU','Total sample RU after blank subtraction','Position in final database','M:C','BIX','HIX','FI','Ultra Violet Humic-like','Marine Humic-like','Visible Humic-like','Tryptophan-like','Tyrosine-like','Phenylalanine-like','Fulvic Acid-like','Optical Brighteners','Diesel Band II','Petroleum-like','Lignin-like','PARAFAC1','PARAFAC2','PARAFAC3','PARAFAC4','PARAFAC5','PARAFAC6'));
 SummaryDataColumns=cat(2,cellstr(char('Sample Name')),FinalSampleIDs');
 for i=1:size(EEMainTrimmed,1)
     SummaryDataNums(1,i)=RamanArea(:,i);
@@ -362,16 +365,21 @@ for i=1:size(EEMainTrimmed,1)
     SummaryDataNums(17,i)=OpticalBrighteners(1,i);
     SummaryDataNums(18,i)=DieselBandII(1,i);
     SummaryDataNums(19,i)=Petroleum(1,i);
+    SummaryDataNums(20,i)=Lignin(1,i);
     if NewSamplePosition(1,i)>0
-        SummaryDataNums(20,i)=PFMax6(NewSamplePosition(1,i),1);
-        SummaryDataNums(21,i)=PFMax6(NewSamplePosition(1,i),2);
-        SummaryDataNums(22,i)=PFMax6(NewSamplePosition(1,i),3);
-        SummaryDataNums(23,i)=PFMax6(NewSamplePosition(1,i),4);
+        SummaryDataNums(21,i)=PFMax6(NewSamplePosition(1,i),1);
+        SummaryDataNums(22,i)=PFMax6(NewSamplePosition(1,i),2);
+        SummaryDataNums(23,i)=PFMax6(NewSamplePosition(1,i),3);
+        SummaryDataNums(24,i)=PFMax6(NewSamplePosition(1,i),4);
+        SummaryDataNums(25,i)=PFMax6(NewSamplePosition(1,i),5);
+        SummaryDataNums(26,i)=PFMax6(NewSamplePosition(1,i),6);
     else
-        SummaryDataNums(20,i)=0;
         SummaryDataNums(21,i)=0;
         SummaryDataNums(22,i)=0;
         SummaryDataNums(23,i)=0;
+        SummaryDataNums(24,i)=0;
+        SummaryDataNums(25,i)=0;
+        SummaryDataNums(26,i)=0;
 
     end;
  end;
